@@ -1,0 +1,287 @@
+{
+  "title": "EMS Security Posture",
+  "uid": "ems-security-posture",
+  "description": "FortiClient endpoint security health — AV coverage, vulnerability severity breakdown, unpatched CVEs, and security event timeline.",
+  "tags": ["ems", "security", "vulnerabilities", "av"],
+  "schemaVersion": 39,
+  "version": 4,
+  "refresh": "5m",
+  "time": { "from": "now-24h", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "AV Protected %",
+      "description": "Percentage of latest FortiClient sessions where av_protected = true.",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "green", "value": 95 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0, "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT ROUND(100.0 * COUNT(*) FILTER (WHERE fu.av_protected = true) / NULLIF(COUNT(*), 0), 1) AS \"AV Protected %\" FROM forticlients_users fu WHERE fu.vdom_id = 1 AND fu.is_latest_user_for_fct = true;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Unpatched Vulnerabilities",
+      "description": "Total unique vulnerability detections with patch_status = 0 across all endpoints.",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 10 },
+              { "color": "red", "value": 50 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(DISTINCT cv.vulnerability_id) AS \"Unpatched Vulnerabilities\" FROM client_vulnerabilities cv WHERE cv.vdom_id = 1 AND cv.patch_status = 0;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Endpoints with Unpatched Vulns",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(DISTINCT cv.client_user_id) AS \"Affected Endpoints\" FROM client_vulnerabilities cv WHERE cv.vdom_id = 1 AND cv.patch_status = 0;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Quarantined Endpoints",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"Quarantined\" FROM forticlients WHERE vdom_id = 1 AND quarantined > 0;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 5,
+      "type": "piechart",
+      "title": "Unpatched Vulnerabilities by Severity",
+      "description": "Based on vuln_severity labels joined through vuln_details. Only shows patch_status = 0 (unpatched).",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Critical" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "High" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Medium" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Low" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+        ]
+      },
+      "options": {
+        "pieType": "pie",
+        "displayLabels": ["name", "percent"],
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COALESCE(vs.severity, 'Unknown') AS \"Severity\", COUNT(*) AS \"Count\" FROM client_vulnerabilities cv LEFT JOIN vuln_details vd ON vd.vid = cv.vulnerability_id AND vd.vdom_id = cv.vdom_id LEFT JOIN vuln_severity vs ON vs.id = vd.severity AND vs.vdom_id = cv.vdom_id WHERE cv.vdom_id = 1 AND cv.patch_status = 0 GROUP BY COALESCE(vs.severity, 'Unknown') ORDER BY \"Count\" DESC;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Top Unpatched Vulnerabilities",
+      "description": "Ranked by CVSS score, then by number of affected endpoints. patch_status = 0 only.",
+      "gridPos": { "h": 9, "w": 16, "x": 8, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "CVSS" },
+            "properties": [
+              { "id": "unit", "value": "short" },
+              { "id": "decimals", "value": 1 },
+              { "id": "custom.displayMode", "value": "color-background" },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 4 },
+                { "color": "orange", "value": 7 },
+                { "color": "red", "value": 9 }
+              ]}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "sortBy": [{ "desc": true, "displayName": "CVSS" }],
+        "footer": { "show": false }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COALESCE(vd.cve_list, CONCAT('VID ', cv.vulnerability_id::text)) AS \"CVEs\", COALESCE(vd.title, 'No vulnerability metadata present in vuln_details') AS \"Title\", COALESCE(vs.severity, 'Unknown') AS \"Severity\", ROUND(vd.cvss::numeric, 1) AS \"CVSS\", COUNT(cv.client_user_id) AS \"Affected Endpoints\" FROM client_vulnerabilities cv LEFT JOIN vuln_details vd ON vd.vid = cv.vulnerability_id AND vd.vdom_id = cv.vdom_id LEFT JOIN vuln_severity vs ON vs.id = vd.severity AND vs.vdom_id = cv.vdom_id WHERE cv.vdom_id = 1 AND cv.patch_status = 0 GROUP BY cv.vulnerability_id, vd.cve_list, vd.title, vs.severity, vd.cvss ORDER BY vd.cvss DESC NULLS LAST, \"Affected Endpoints\" DESC LIMIT 50;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "AV Scans Completed (hourly)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "time_series",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT DATE_TRUNC('hour', ash.time) AS \"time\", COUNT(*) AS \"Scans\" FROM av_scan_history ash WHERE ash.vdom_id = 1 AND ash.time >= NOW() - INTERVAL '24 hours' GROUP BY DATE_TRUNC('hour', ash.time) ORDER BY \"time\";",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Recent Security Events",
+      "description": "Latest 100 endpoint events within the selected time range.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Time" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": {
+        "sortBy": [{ "desc": true, "displayName": "Time" }],
+        "footer": { "show": false }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT e.insert_time AS \"Time\", et.type AS \"Event Type\", e.name AS \"Event\", e.source AS \"Source\", e.message AS \"Message\" FROM events e JOIN event_types et ON et.id = e.type AND et.vdom_id = e.vdom_id WHERE e.vdom_id = 1 AND e.insert_time >= NOW() - INTERVAL '24 hours' ORDER BY e.insert_time DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+# Grafana datasource provisioning for FortiClient EMS
+#
+# This file REPLACES the bundled loki.yml from the container image.
+# It is functionally identical to loki.yml but adds explicit UID fields so that
+# dashboard JSON can reference datasources by stable, known UIDs rather than
+# Grafana-generated random strings.
+#
+# Environment variables (EMS_DB_HOST, EMS_DB_PORT, EMS_DB_USER, EMS_DB_PASSWORD)
+# are injected via docker-compose.override.yml and resolved by Grafana at startup.
+
+apiVersion: 1
+
+datasources:
+  - name: Loki
+    uid: ems-loki
+    type: loki
+    url: http://loki:3100
+    isDefault: true
+    access: proxy
+
+  - name: fcm
+    uid: ems-fcm
+    type: postgres
+    access: proxy
+    url: "${EMS_DB_HOST}:${EMS_DB_PORT}"
+    database: fcm
+    user: "${EMS_DB_USER}"
+    secureJsonData:
+      password: "${EMS_DB_PASSWORD}"
+    jsonData:
+      database: fcm
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false
+
+  - name: fcm_default
+    uid: ems-fcm-default
+    type: postgres
+    access: proxy
+    url: "${EMS_DB_HOST}:${EMS_DB_PORT}"
+    database: fcm_default
+    user: "${EMS_DB_USER}"
+    secureJsonData:
+      password: "${EMS_DB_PASSWORD}"
+    jsonData:
+      database: fcm_default
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false

@@ -1,0 +1,141 @@
+{
+  "title": "EMS Policies & ZTNA",
+  "uid": "ems-policies-ztna",
+  "description": "Policy distribution, tags, and ZTNA certificate state from the endpoint telemetry database.",
+  "tags": ["ems", "policies", "ztna", "sql"],
+  "schemaVersion": 39,
+  "version": 4,
+  "refresh": "5m",
+  "time": { "from": "now-30d", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Policies",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Policies\" FROM endpoint_policies WHERE vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Enabled Policies",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Enabled Policies\" FROM endpoint_policies WHERE vdom_id = 1 AND enabled = true;", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Tagged Endpoints",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(DISTINCT client_id) AS \"Tagged Endpoints\" FROM fct_tags WHERE vdom_id = 1 AND is_assigned = true;", "refId": "A" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "ZTNA Cert Records",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"ZTNA Cert Records\" FROM endpoint_ztna_cert_status WHERE vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Policy Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Latest Users" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COALESCE(ep.name, CONCAT('Policy ', fu.policy_id::text)) AS \"Policy\", COUNT(*) AS \"Latest Users\" FROM forticlients_users fu LEFT JOIN endpoint_policies ep ON ep.id = fu.policy_id AND ep.vdom_id = fu.vdom_id WHERE fu.vdom_id = 1 AND fu.is_latest_user_for_fct = true GROUP BY COALESCE(ep.name, CONCAT('Policy ', fu.policy_id::text)) ORDER BY \"Latest Users\" DESC;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Latest Endpoint Sessions",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Last Seen" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Last Seen" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT d.name AS \"Device\", fu.id AS \"Client User ID\", fu.user_service AS \"User Source\", COALESCE(ep.name, CONCAT('Policy ', fu.policy_id::text)) AS \"Policy\", fu.last_seen AS \"Last Seen\", fu.av_protected AS \"AV Protected\", fu.token_id AS \"Token ID\" FROM forticlients_users fu LEFT JOIN forticlients f ON f.id = fu.client_id AND f.vdom_id = fu.vdom_id LEFT JOIN devices d ON d.id = f.devices_id AND d.vdom_id = f.vdom_id LEFT JOIN endpoint_policies ep ON ep.id = fu.policy_id AND ep.vdom_id = fu.vdom_id WHERE fu.vdom_id = 1 AND fu.is_latest_user_for_fct = true ORDER BY fu.last_seen DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Tag Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Assignments" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT t.name AS \"Tag\", COUNT(*) AS \"Assignments\" FROM fct_tags ft JOIN tags t ON t.id = ft.tag_id AND t.vdom_id = ft.vdom_id WHERE ft.vdom_id = 1 AND ft.is_assigned = true GROUP BY t.name ORDER BY \"Assignments\" DESC LIMIT 50;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "ZTNA Certificate Status",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Updated" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Updated" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT ecs.serial AS \"Serial\", ecs.cert_update_time AS \"Updated\", ecs.mdm_deploy_status AS \"MDM Deploy Status\", ecs.mdm_last_deploy AS \"Last Deploy\", fu.policy_id AS \"Policy ID\", d.name AS \"Device\" FROM endpoint_ztna_cert_status ecs JOIN forticlients_users fu ON fu.id = ecs.client_user_id AND fu.vdom_id = ecs.vdom_id LEFT JOIN forticlients f ON f.id = fu.client_id AND f.vdom_id = fu.vdom_id LEFT JOIN devices d ON d.id = f.devices_id AND d.vdom_id = f.vdom_id WHERE ecs.vdom_id = 1 ORDER BY ecs.cert_update_time DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    }
+  ]
+}

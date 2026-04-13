@@ -1,0 +1,152 @@
+{
+  "title": "EMS Operations",
+  "uid": "ems-operations",
+  "description": "Synthetic checks for public and internal endpoints plus log-derived operational signals.",
+  "tags": ["ems", "operations", "blackbox", "loki"],
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": {
+    "list": [
+      {
+        "name": "project",
+        "label": "Compose Project Regex",
+        "type": "textbox",
+        "query": "ems-.*",
+        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "hide": 0
+      },
+      {
+        "name": "service",
+        "label": "Service Regex",
+        "type": "textbox",
+        "query": "deploy|webserver|nginx|ztna",
+        "current": { "text": "deploy|webserver|nginx|ztna", "value": "deploy|webserver|nginx|ztna" },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Public HTTPS Checks Up",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "count(probe_success{job=\"blackbox-https\"} == 1)", "instant": true, "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Internal HTTP Checks Up",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "count(probe_success{job=\"blackbox-http\"} == 1)", "instant": true, "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Deploy Endpoint Up",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://deploy:8010/\"}", "instant": true, "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Webserver Endpoint Up",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://webserver:8000/\"}", "instant": true, "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Probe Success",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=~\"blackbox-https|blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A" }]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Probe Duration",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "s" }, "overrides": [] },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=~\"blackbox-https|blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A" }]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "HTTP Status Codes",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": {
+        "sortBy": [{ "desc": false, "displayName": "Value" }],
+        "footer": { "show": false }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_http_status_code{job=~\"blackbox-https|blackbox-http\"}", "instant": true, "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Operational Error Rate",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "sum by (service) (rate({project=~\"$project\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic|timeout|failed)\" [5m]))",
+        "legendFormat": "{{service}}",
+        "queryType": "range",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 9,
+      "type": "logs",
+      "title": "Live Operational Logs",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "{project=~\"$project\", service=~\"$service\"}",
+        "legendFormat": "",
+        "maxLines": 500,
+        "refId": "A"
+      }]
+    }
+  ]
+}

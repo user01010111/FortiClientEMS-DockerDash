@@ -1,0 +1,164 @@
+{
+  "title": "EMS Service Logs",
+  "uid": "ems-service-logs",
+  "description": "Real-time log streams and error rates from all EMS microservices via Loki. Use the service and level variables to filter.",
+  "tags": ["ems", "logs", "loki", "observability"],
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": {
+    "list": [
+      {
+        "name": "project",
+        "label": "Compose Project Regex",
+        "type": "textbox",
+        "query": "ems-.*",
+        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "hide": 0
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "query": "label_values({project=~\"$project\"}, service)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "level",
+        "label": "Log Level",
+        "type": "custom",
+        "query": "error,warn,info,debug",
+        "options": [
+          { "text": "error", "value": "error", "selected": false },
+          { "text": "warn",  "value": "warn",  "selected": false },
+          { "text": "info",  "value": "info",  "selected": false },
+          { "text": "debug", "value": "debug", "selected": false }
+        ],
+        "multi": false,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Log Volume per Service",
+      "description": "Lines per second per service. Spikes may indicate increased activity or log verbosity changes.",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 1, "fillOpacity": 5 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+      },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"}[5m]))",
+        "legendFormat": "{{service}}",
+        "queryType": "range",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Error Rate per Service",
+      "description": "Lines matching error|exception|fatal|panic per second, per service.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+      },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [5m]))",
+        "legendFormat": "{{service}}",
+        "queryType": "range",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Top Error-Producing Services (last hour)",
+      "description": "Services ranked by total error-level log lines in the last hour.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [{ "desc": true, "displayName": "Error Lines" }],
+        "footer": { "show": false }
+      },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "topk(15, sum by (service) (count_over_time({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [1h])))",
+        "legendFormat": "{{service}}",
+        "instant": true,
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 4,
+      "type": "logs",
+      "title": "Live Log Stream — $service",
+      "description": "Filtered by service variable. Use level variable to narrow to a specific log level keyword.",
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 16 },
+      "datasource": { "type": "loki", "uid": "ems-loki" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [{
+        "datasource": { "type": "loki", "uid": "ems-loki" },
+        "expr": "{project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)${level:regex}\"",
+        "legendFormat": "",
+        "maxLines": 500,
+        "refId": "A"
+      }]
+    }
+  ]
+}

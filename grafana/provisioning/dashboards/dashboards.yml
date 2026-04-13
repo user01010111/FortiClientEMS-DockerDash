@@ -1,0 +1,16 @@
+# Grafana dashboard provisioning configuration.
+# Grafana scans /var/lib/grafana/dashboards for JSON files at startup and on each
+# updateIntervalSeconds tick. Set allowUiUpdates: false once dashboards are stable.
+
+apiVersion: 1
+
+providers:
+  - name: forticlientems-dashboards
+    orgId: 1
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

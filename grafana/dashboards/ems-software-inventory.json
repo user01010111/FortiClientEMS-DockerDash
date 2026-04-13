@@ -1,0 +1,141 @@
+{
+  "title": "EMS Software Inventory",
+  "uid": "ems-software-inventory",
+  "description": "Software prevalence, vendors, and recent installs from EMS inventory tables.",
+  "tags": ["ems", "software", "inventory", "sql"],
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "5m",
+  "time": { "from": "now-30d", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Software Rows",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Software Rows\" FROM client_software WHERE vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Distinct Packages",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(DISTINCT software_id) AS \"Distinct Packages\" FROM client_software WHERE vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Distinct Vendors",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(DISTINCT COALESCE(NULLIF(s.vendor, ''), 'Unknown')) AS \"Distinct Vendors\" FROM client_software cs JOIN software s ON s.id = cs.software_id AND s.vdom_id = cs.vdom_id WHERE cs.vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Inventory Jobs",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Inventory Jobs\" FROM sw_inventory_jobs WHERE vdom_id = 1;", "refId": "A" }]
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Top Installed Packages",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Installed On" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT s.name AS \"Software\", COALESCE(NULLIF(s.vendor, ''), 'Unknown') AS \"Vendor\", COALESCE(NULLIF(s.version, ''), 'Unknown') AS \"Version\", COUNT(*) AS \"Installed On\" FROM client_software cs JOIN software s ON s.id = cs.software_id AND s.vdom_id = cs.vdom_id WHERE cs.vdom_id = 1 GROUP BY s.name, s.vendor, s.version ORDER BY \"Installed On\" DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Vendor Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Installations" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COALESCE(NULLIF(s.vendor, ''), 'Unknown') AS \"Vendor\", COUNT(*) AS \"Installations\" FROM client_software cs JOIN software s ON s.id = cs.software_id AND s.vdom_id = cs.vdom_id WHERE cs.vdom_id = 1 GROUP BY COALESCE(NULLIF(s.vendor, ''), 'Unknown') ORDER BY \"Installations\" DESC LIMIT 50;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Recent Installs",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Installed" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Installed" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT cs.install_date AS \"Installed\", s.name AS \"Software\", COALESCE(NULLIF(s.vendor, ''), 'Unknown') AS \"Vendor\", COALESCE(NULLIF(s.version, ''), 'Unknown') AS \"Version\", cs.client_user_id AS \"Client User ID\" FROM client_software cs JOIN software s ON s.id = cs.software_id AND s.vdom_id = cs.vdom_id WHERE cs.vdom_id = 1 AND cs.install_date IS NOT NULL ORDER BY cs.install_date DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Recently Catalogued Packages",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Created" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": { "sortBy": [{ "desc": true, "displayName": "Created" }], "footer": { "show": false } },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT created_date AS \"Created\", name AS \"Software\", COALESCE(NULLIF(vendor, ''), 'Unknown') AS \"Vendor\", COALESCE(NULLIF(version, ''), 'Unknown') AS \"Version\" FROM software WHERE vdom_id = 1 ORDER BY created_date DESC LIMIT 100;",
+        "refId": "A"
+      }]
+    }
+  ]
+}

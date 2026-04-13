@@ -1,0 +1,275 @@
+{
+  "title": "EMS Fleet Overview",
+  "uid": "ems-fleet-overview",
+  "description": "FortiClient endpoint fleet summary — counts, online status, OS distribution, version spread, and registration activity.",
+  "tags": ["ems", "fleet", "forticlient"],
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "5m",
+  "time": { "from": "now-24h", "to": "now" },
+  "timezone": "browser",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Endpoints",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"Total Endpoints\" FROM devices WHERE vdom_id = 1;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Online",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"Online\" FROM forticlients WHERE vdom_id = 1 AND online = true;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Offline",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"Offline\" FROM forticlients WHERE vdom_id = 1 AND online = false;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Quarantined",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"Quarantined\" FROM forticlients WHERE vdom_id = 1 AND quarantined > 0;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "AV Running",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT COUNT(*) AS \"AV Running\" FROM forticlients WHERE vdom_id = 1 AND av_running = true;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 6,
+      "type": "piechart",
+      "title": "OS Distribution",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "pieType": "pie",
+        "displayLabels": ["name", "percent"],
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT d.os_type AS \"OS Type\", COUNT(*) AS \"Endpoints\" FROM devices d WHERE d.vdom_id = 1 AND d.os_type IS NOT NULL AND d.os_type != '' GROUP BY d.os_type ORDER BY \"Endpoints\" DESC;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 7,
+      "type": "barchart",
+      "title": "FortiClient Version Distribution",
+      "description": "Sorted by version number (comparable_fct_version integer). Newest versions at top.",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 80 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "_sort" }, "properties": [{ "id": "custom.hidden", "value": true }] }
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xField": "Version",
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "hidden" }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT f.fct_version_major_minor_patch AS \"Version\", COUNT(*) AS \"Endpoints\", MAX(f.comparable_fct_version) AS \"_sort\" FROM forticlients f WHERE f.vdom_id = 1 AND f.fct_version_major_minor_patch IS NOT NULL GROUP BY f.fct_version_major_minor_patch ORDER BY MAX(f.comparable_fct_version) DESC;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Recently Registered Endpoints (last 7 days)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Registered" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": {
+        "sortBy": [{ "desc": true, "displayName": "Registered" }],
+        "footer": { "show": false }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT d.name AS \"Device\", d.os_type AS \"OS\", d.os_version AS \"OS Version\", d.ip_addr::text AS \"IP\", d.created_at AS \"Registered\" FROM devices d WHERE d.vdom_id = 1 AND d.created_at >= NOW() - INTERVAL '7 days' ORDER BY d.created_at DESC LIMIT 50;",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Offline > 7 Days",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Last Seen" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+        ]
+      },
+      "options": {
+        "sortBy": [{ "desc": false, "displayName": "Last Seen" }],
+        "footer": { "show": false }
+      },
+      "targets": [{
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
+        "format": "table",
+        "editorMode": "code",
+        "rawQuery": true,
+        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
+        "rawSql": "SELECT d.name AS \"Device\", d.os_type AS \"OS\", d.ip_addr::text AS \"Last IP\", TO_TIMESTAMP(f.last_seen) AS \"Last Seen\" FROM forticlients f JOIN devices d ON d.id = f.devices_id AND d.vdom_id = f.vdom_id WHERE f.vdom_id = 1 AND f.online = false AND f.last_seen > 0 AND TO_TIMESTAMP(f.last_seen) < NOW() - INTERVAL '7 days' ORDER BY f.last_seen ASC LIMIT 50;",
+        "refId": "A"
+      }]
+    }
+  ]
+}

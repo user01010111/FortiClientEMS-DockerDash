@@ -1,0 +1,153 @@
+# docker-compose.override.yml
+# Automatically merged with docker-compose.yaml by Docker Compose.
+# Place this file alongside the EMS compose project root (or symlink it there).
+#
+# PURPOSE: Exposes the bundled Grafana instance, fixes the PostgreSQL datasources,
+# and provisions custom dashboards as a clean overlay on top of the EMS stack.
+#
+# MAINTENANCE: If EMS is upgraded and docker-compose.yaml changes, this file is
+# unaffected. However, re-extract nginx/nginx.conf from the new nginx container
+# and re-apply the Grafana location patch (see nginx/nginx.conf).
+
+services:
+
+  grafana:
+    environment:
+      # ── Fix broken PostgreSQL datasources ─────────────────────────────────
+      # The bundled provisioning YAML (loki.yml) references these variables but
+      # the base compose file never injects them into the container. Adding them
+      # here causes Grafana's provisioner to resolve the ${VAR} substitutions on
+      # startup, making both the fcm and fcm_default datasources functional.
+      EMS_DB_HOST: db
+      EMS_DB_PORT: "5432"
+      EMS_DB_USER: postgres
+      EMS_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+
+      # ── Sub-path serving ───────────────────────────────────────────────────
+      # Grafana is proxied at /grafana/ on the EMS nginx (port 443).
+      # These two vars tell Grafana to prefix all its asset/API paths accordingly.
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_ROOT_URL: "https://${FQDN}/grafana/"
+
+      # ── Admin credential ───────────────────────────────────────────────────
+      # Replaces the default admin/admin. Set GF_ADMIN_PASSWORD in .env.
+      GF_SECURITY_ADMIN_PASSWORD: "${GF_ADMIN_PASSWORD}"
+      GF_METRICS_ENABLED: "true"
+
+    volumes:
+      # Replace the baked-in datasource provisioning so we can set explicit UIDs
+      # (required for dashboard JSON to reference datasources by stable UID).
+      - ./FortiClientEMS-DockerDash/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      # Dashboard provisioner config — tells Grafana where to find JSON files.
+      - ./FortiClientEMS-DockerDash/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      # Dashboard JSON files.
+      - ./FortiClientEMS-DockerDash/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  nginx:
+    volumes:
+      # Replace the nginx config template, not the rendered config. EMS writes
+      # /etc/nginx/nginx.conf from this template on each container start.
+      # Re-extract and re-patch on each EMS version upgrade.
+      # Extracted from: ems_nginx:7.4.7.2194
+      - ./FortiClientEMS-DockerDash/nginx/nginx.conf:/etc/nginx/nginx.conf.template:ro
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    networks:
+      - forticlientems
+    environment:
+      GF_ADMIN_PASSWORD: "${GF_ADMIN_PASSWORD}"
+    volumes:
+      - ./FortiClientEMS-DockerDash/prometheus/prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
+      - ./FortiClientEMS-DockerDash/prometheus/blackbox.yml:/etc/prometheus/blackbox.yml:ro
+      - ./FortiClientEMS-DockerDash/prometheus/entrypoint.sh:/etc/prometheus/entrypoint.sh:ro
+      - prometheus-data:/prometheus
+    entrypoint: ["/bin/sh", "/etc/prometheus/entrypoint.sh"]
+
+  node-exporter:
+    image: prom/node-exporter
+    restart: always
+    networks:
+      - forticlientems
+    command:
+      - "--path.rootfs=/host"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)"
+    volumes:
+      - /:/host:ro,rslave
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    restart: always
+    privileged: true
+    networks:
+      - forticlientems
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+
+  nginx-prometheus-exporter:
+    image: nginx/nginx-prometheus-exporter
+    restart: always
+    networks:
+      - forticlientems
+    command:
+      - --nginx.scrape-uri=http://nginx:18080/stub_status
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    restart: always
+    networks:
+      - forticlientems
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable"
+
+  redis-exporter:
+    image: oliver006/redis_exporter:alpine
+    restart: always
+    networks:
+      - forticlientems
+    volumes:
+      - db_shared_data:/db:ro
+    entrypoint:
+      - /bin/sh
+      - -lc
+      - . /db/.env && exec /redis_exporter --redis.addr=redis://redis:6379 --redis.password="$${EMS_REDIS_PASSWORD}"
+
+  pgbouncer-exporter:
+    image: spreaker/prometheus-pgbouncer-exporter:latest
+    restart: always
+    networks:
+      - forticlientems
+    environment:
+      PGBOUNCER_HOST: pgbouncer
+      PGBOUNCER_PORT: "6432"
+      PGBOUNCER_USER: postgres
+      PGBOUNCER_PASS: "${POSTGRES_PASSWORD}"
+      PGBOUNCER_EXPORTER_HOST: 0.0.0.0
+
+  consul-exporter:
+    image: prom/consul-exporter
+    restart: always
+    networks:
+      - forticlientems
+    command:
+      - --consul.server=http://consul:8500
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    restart: always
+    networks:
+      - forticlientems
+    volumes:
+      - ./FortiClientEMS-DockerDash/prometheus/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    command:
+      - --config.file=/etc/blackbox_exporter/config.yml
+
+volumes:
+  prometheus-data:
