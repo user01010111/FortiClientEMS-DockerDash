@@ -42,6 +42,318 @@ Representative screenshots from the working stack are included under [`docs/scre
 
 </details>
 
+## Vanilla EMS Service Maps
+
+These diagrams describe the stock FortiClient EMS Docker deployment, not the extra observability services added by this project. They are based on the vanilla `docker-compose.yaml` service names, published ports, and declared `depends_on` relationships.
+
+<details>
+<summary>1. Vanilla service map</summary>
+
+```mermaid
+flowchart TD
+  subgraph Edge["Published entry points"]
+    nginx["nginx
+80, 443, 10443"]
+    fos["fos
+8015, 50000"]
+    ecsocksrv["ecsocksrv
+8013"]
+    adevtsrv["adevtsrv
+8871"]
+    scep["scep
+4001, 4002"]
+    chromebook["chromebook
+8443"]
+  end
+
+  subgraph Platform["Core platform"]
+    db["db"]
+    redis["redis"]
+    consul["consul"]
+    deploy["deploy"]
+    pgbouncer["pgbouncer"]
+    ws_pgbouncer["ws_pgbouncer"]
+    das["das"]
+    dbop["dbop"]
+    daemons["daemons"]
+    webserver["webserver"]
+    monitor["monitor"]
+    adconnector["adconnector"]
+    ztna["ztna"]
+    mdmproxy["mdmproxy"]
+  end
+
+  subgraph Workers["Worker services"]
+    probe["probe"]
+    reg["reg"]
+    tag["tag"]
+    ka["ka"]
+    upload["upload"]
+    event["event"]
+    forensics["forensics"]
+  end
+
+  subgraph BuiltInObs["Bundled observability"]
+    promtail["promtail"]
+    loki["loki"]
+    grafana["grafana"]
+  end
+
+  db --> pgbouncer
+  db --> ws_pgbouncer
+  db --> consul
+  db --> redis
+  deploy --> redis
+
+  db --> das
+  redis --> das
+
+  das --> fos
+  db --> fos
+
+  db --> ecsocksrv
+  consul --> ecsocksrv
+  fos --> ecsocksrv
+
+  db --> adevtsrv
+  fos --> adevtsrv
+  consul --> adevtsrv
+  redis --> adevtsrv
+
+  db --> probe
+  das --> probe
+  fos --> probe
+  consul --> probe
+  redis --> probe
+
+  db --> reg
+  das --> reg
+  fos --> reg
+  consul --> reg
+  redis --> reg
+
+  db --> tag
+  das --> tag
+  fos --> tag
+  consul --> tag
+  redis --> tag
+
+  db --> ka
+  das --> ka
+  fos --> ka
+  consul --> ka
+  redis --> ka
+
+  db --> upload
+  das --> upload
+  fos --> upload
+  consul --> upload
+  redis --> upload
+
+  db --> event
+  das --> event
+  fos --> event
+  consul --> event
+  redis --> event
+
+  db --> forensics
+  das --> forensics
+  fos --> forensics
+  consul --> forensics
+  redis --> forensics
+
+  db --> dbop
+  das --> dbop
+  fos --> dbop
+  consul --> dbop
+  redis --> dbop
+
+  db --> ztna
+  das --> ztna
+  redis --> ztna
+
+  promtail --> mdmproxy
+  pgbouncer --> mdmproxy
+  nginx --> mdmproxy
+  webserver --> mdmproxy
+
+  pgbouncer --> scep
+  nginx --> scep
+  webserver --> scep
+  mdmproxy --> scep
+
+  das --> chromebook
+
+  ztna --> nginx
+
+  db --> daemons
+  das --> daemons
+  redis --> daemons
+  fos --> daemons
+
+  das --> monitor
+  redis --> monitor
+
+  db --> adconnector
+  das --> adconnector
+  redis --> adconnector
+
+  loki --> promtail
+```
+
+</details>
+
+<details>
+<summary>2. Published ports in the vanilla deployment</summary>
+
+```mermaid
+flowchart LR
+  Internet["Clients / Internet"]
+
+  subgraph EMS["Vanilla EMS published services"]
+    nginx["nginx
+80, 443, 10443"]
+    fos["fos
+8015, 50000"]
+    ecsocksrv["ecsocksrv
+8013"]
+    adevtsrv["adevtsrv
+8871"]
+    scep["scep
+4001, 4002"]
+    chromebook["chromebook
+8443"]
+  end
+
+  Internet --> nginx
+  Internet --> fos
+  Internet --> ecsocksrv
+  Internet --> adevtsrv
+  Internet --> scep
+  Internet --> chromebook
+```
+
+</details>
+
+<details>
+<summary>3. Operator-friendly view</summary>
+
+```mermaid
+flowchart TB
+  subgraph Public["Public-facing edge"]
+    PublicWeb["Public web entry
+(nginx)"]
+    FOS["Core EMS network service
+(fos)"]
+    ECSock["Endpoint socket service
+(ecsocksrv)"]
+    ADEvents["AD event listener
+(adevtsrv)"]
+    SCEP["Certificate enrollment service
+(scep)"]
+    Chromebook["Chromebook service
+(chromebook)"]
+  end
+
+  subgraph App["Application and control plane"]
+    WebUI["EMS web application
+(webserver)"]
+    Bootstrap["Deployment/bootstrap
+(deploy)"]
+    DAS["Core backend service
+(das)"]
+    DBOP["Database operations
+(dbop)"]
+    Daemons["Shared background daemons
+(daemons)"]
+    Monitor["Monitoring worker
+(monitor)"]
+    ADConnector["Active Directory connector
+(adconnector)"]
+    ZTNA["ZTNA service
+(ztna)"]
+    MDM["MDM proxy
+(mdmproxy)"]
+  end
+
+  subgraph Data["Data and coordination"]
+    Postgres["PostgreSQL
+(db)"]
+    PgBouncer["PgBouncer
+(pgbouncer)"]
+    WsPgBouncer["Webserver PgBouncer
+(ws_pgbouncer)"]
+    Redis["Redis cache / queue
+(redis)"]
+    Consul["Service coordination
+(consul)"]
+  end
+
+  subgraph Workers["Background workers"]
+    Probe["Probe worker
+(probe)"]
+    Register["Register worker
+(reg)"]
+    Tag["Tag worker
+(tag)"]
+    KeepAlive["Keepalive worker
+(ka)"]
+    Upload["Upload worker
+(upload)"]
+    Event["Event worker
+(event)"]
+    Forensics["Forensics worker
+(forensics)"]
+  end
+
+  subgraph Logs["Bundled logging and dashboards"]
+    Promtail["Promtail"]
+    Loki["Loki"]
+    Grafana["Grafana"]
+  end
+
+  PublicWeb --> WebUI
+  PublicWeb --> MDM
+  PublicWeb --> SCEP
+  PublicWeb --> ZTNA
+
+  Bootstrap --> Redis
+  Postgres --> PgBouncer
+  Postgres --> WsPgBouncer
+  Postgres --> DAS
+  Postgres --> DBOP
+  Postgres --> Daemons
+  Postgres --> ADConnector
+
+  Redis --> DAS
+  Redis --> Daemons
+  Redis --> Monitor
+  Redis --> ADConnector
+  Redis --> ZTNA
+
+  DAS --> FOS
+  DAS --> Probe
+  DAS --> Register
+  DAS --> Tag
+  DAS --> KeepAlive
+  DAS --> Upload
+  DAS --> Event
+  DAS --> Forensics
+  DAS --> Chromebook
+
+  Consul --> Probe
+  Consul --> Register
+  Consul --> Tag
+  Consul --> KeepAlive
+  Consul --> Upload
+  Consul --> Event
+  Consul --> Forensics
+
+  Loki --> Promtail
+```
+
+</details>
+
 ## Prerequisites
 
 - FortiClient EMS v7.4.7+ running via Docker Compose (the three observability containers — `promtail`, `loki`, `grafana` — must be healthy)
