@@ -147,7 +147,7 @@ FortiClientEMS-DockerDash/
 │   ├── provisioning/
 │   │   ├── datasources/
 │   │   │   ├── loki.yml                  # Loki + fcm + fcm_default datasources
-│   │   │   └── metrics.yml               # Prometheus datasource
+│   │   │   ├── metrics.yml               # Prometheus datasource
 │   │   └── dashboards/
 │   │       └── dashboards.yml            # File provider config
 │   └── dashboards/

@@ -4,7 +4,7 @@
   "description": "Host CPU, memory, filesystem, disk, and network health from node-exporter.",
   "tags": ["ems", "host", "node-exporter"],
   "schemaVersion": 39,
-  "version": 1,
+  "version": 3,
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -156,7 +156,7 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [
         {
@@ -201,7 +201,7 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [
         {
@@ -234,7 +234,7 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [
         {
@@ -253,23 +253,42 @@
     },
     {
       "id": 8,
-      "type": "table",
+      "type": "bargauge",
       "title": "Filesystem Usage",
+      "description": "Used capacity by mountpoint. Docker scratch mounts and tmpfs-style filesystems are excluded.",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
-        "defaults": { "custom": { "align": "auto" } },
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 75 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
         "overrides": []
       },
       "options": {
-        "sortBy": [{ "desc": true, "displayName": "Value" }],
-        "footer": { "show": false }
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {},
+        "valueMode": "color"
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "100 * (1 - (node_filesystem_avail_bytes{fstype!=\"\", mountpoint!~\"/run.*|/var/lib/docker.*\"} / node_filesystem_size_bytes{fstype!=\"\", mountpoint!~\"/run.*|/var/lib/docker.*\"}))",
+        "expr": "sort_desc(max by (mountpoint, fstype) (100 * (1 - (node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs|nsfs\", mountpoint!~\"/run.*|/var/lib/docker.*\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay|squashfs|nsfs\", mountpoint!~\"/run.*|/var/lib/docker.*\"}))))",
         "instant": true,
-        "legendFormat": "",
+        "legendFormat": "{{mountpoint}} ({{fstype}})",
         "refId": "A"
       }]
     }

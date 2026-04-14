@@ -4,7 +4,7 @@
   "description": "Real-time log streams and error rates from all EMS microservices via Loki. Use the service and level variables to filter.",
   "tags": ["ems", "logs", "loki", "observability"],
   "schemaVersion": 39,
-  "version": 2,
+  "version": 8,
   "refresh": "30s",
   "time": { "from": "now-1h", "to": "now" },
   "timezone": "browser",
@@ -74,11 +74,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
-        "expr": "sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"}[5m]))",
+        "expr": "topk(8, sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"}[5m])))",
         "legendFormat": "{{service}}",
         "queryType": "range",
         "refId": "A"
@@ -101,11 +101,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
-        "expr": "sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [5m]))",
+        "expr": "topk(8, sum by (service) (rate({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [5m])))",
         "legendFormat": "{{service}}",
         "queryType": "range",
         "refId": "A"
@@ -128,7 +128,7 @@
       },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
-        "expr": "topk(15, sum by (service) (count_over_time({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [1h])))",
+        "expr": "topk(10, sum by (service) (count_over_time({project=~\"$project\", service=~\"${service:regex}\"} |~ \"(?i)(error|exception|fatal|panic)\" [1h])))",
         "legendFormat": "{{service}}",
         "instant": true,
         "refId": "A"

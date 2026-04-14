@@ -4,7 +4,7 @@
   "description": "nginx active connections, traffic, container resources, and log flow.",
   "tags": ["ems", "nginx", "reverse-proxy"],
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "30s",
   "time": { "from": "now-6h", "to": "now" },
   "timezone": "browser",
@@ -88,7 +88,7 @@
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
         "overrides": []
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "nginx_connections_active", "legendFormat": "active", "refId": "A" },
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "nginx_connections_reading", "legendFormat": "reading", "refId": "B" },
@@ -106,7 +106,7 @@
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
         "overrides": []
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "sum(rate(nginx_http_requests_total[5m]))", "legendFormat": "requests/s", "refId": "A" }]
     },
     {
@@ -119,7 +119,7 @@
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
         "overrides": []
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
         "expr": "sum(rate({project=~\"$project\", service=\"nginx\"} |~ \"(?i)(warn|error|crit|alert|emerg)\" [5m]))",

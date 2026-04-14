@@ -4,7 +4,7 @@
   "description": "PostgreSQL, PgBouncer, and Redis activity, capacity, and pool health.",
   "tags": ["ems", "postgres", "redis", "pgbouncer"],
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -76,7 +76,7 @@
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "sum(rate(pg_stat_database_xact_commit{datname=~\"fcm|fcm_default|postgres\"}[5m]))", "legendFormat": "commits", "refId": "A" },
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "sum(rate(pg_stat_database_xact_rollback{datname=~\"fcm|fcm_default|postgres\"}[5m]))", "legendFormat": "rollbacks", "refId": "B" }
@@ -89,7 +89,7 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "sum(pgbouncer_pools_client_active_connections)", "legendFormat": "active", "refId": "A" },
         { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "sum(pgbouncer_pools_client_waiting_connections)", "legendFormat": "waiting", "refId": "B" }
@@ -98,29 +98,61 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "Redis Operations",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "title": "Redis Command Rate",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_commands_processed_total[5m])", "legendFormat": "commands/s", "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_net_input_bytes_total[5m])", "legendFormat": "input B/s", "refId": "B" },
-        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_net_output_bytes_total[5m])", "legendFormat": "output B/s", "refId": "C" }
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_commands_processed_total[5m])", "legendFormat": "commands/s", "refId": "A" }
       ]
     },
     {
       "id": 8,
-      "type": "table",
-      "title": "Database Sizes",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "type": "timeseries",
+      "title": "Redis Network Throughput",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "Bps" }, "overrides": [] },
       "options": {
-        "sortBy": [{ "desc": true, "displayName": "Value" }],
-        "footer": { "show": false }
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "pg_database_size_bytes{datname=~\"fcm|fcm_default|postgres\"}", "instant": true, "legendFormat": "", "refId": "A" }]
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_net_input_bytes_total[5m])", "legendFormat": "input", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "rate(redis_net_output_bytes_total[5m])", "legendFormat": "output", "refId": "B" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "bargauge",
+      "title": "Database Sizes",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "bytes",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {},
+        "valueMode": "color"
+      },
+      "targets": [{
+        "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+        "expr": "pg_database_size_bytes{datname=~\"fcm|fcm_default|postgres\"}",
+        "instant": true,
+        "legendFormat": "{{datname}}",
+        "refId": "A"
+      }]
     }
   ]
 }

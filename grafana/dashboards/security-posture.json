@@ -4,7 +4,7 @@
   "description": "FortiClient endpoint security health — AV coverage, vulnerability severity breakdown, unpatched CVEs, and security event timeline.",
   "tags": ["ems", "security", "vulnerabilities", "av"],
   "schemaVersion": 39,
-  "version": 4,
+  "version": 5,
   "refresh": "5m",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -161,7 +161,7 @@
       "id": 5,
       "type": "piechart",
       "title": "Unpatched Vulnerabilities by Severity",
-      "description": "Based on vuln_severity labels joined through vuln_details. Only shows patch_status = 0 (unpatched).",
+      "description": "Based on vuln_severity labels joined through vuln_details. Only shows patch_status = 0 (unpatched). Unknown means EMS has detections without matching vulnerability metadata.",
       "gridPos": { "h": 9, "w": 8, "x": 0, "y": 4 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
@@ -170,7 +170,8 @@
           { "matcher": { "id": "byName", "options": "Critical" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "High" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
           { "matcher": { "id": "byName", "options": "Medium" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "Low" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+          { "matcher": { "id": "byName", "options": "Low" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Unknown" }, "properties": [{ "id": "color", "value": { "fixedColor": "gray", "mode": "fixed" } }] }
         ]
       },
       "options": {
@@ -185,7 +186,7 @@
         "editorMode": "code",
         "rawQuery": true,
         "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT COALESCE(vs.severity, 'Unknown') AS \"Severity\", COUNT(*) AS \"Count\" FROM client_vulnerabilities cv LEFT JOIN vuln_details vd ON vd.vid = cv.vulnerability_id AND vd.vdom_id = cv.vdom_id LEFT JOIN vuln_severity vs ON vs.id = vd.severity AND vs.vdom_id = cv.vdom_id WHERE cv.vdom_id = 1 AND cv.patch_status = 0 GROUP BY COALESCE(vs.severity, 'Unknown') ORDER BY \"Count\" DESC;",
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE vs.severity = 'Critical') AS \"Critical\", COUNT(*) FILTER (WHERE vs.severity = 'High') AS \"High\", COUNT(*) FILTER (WHERE vs.severity = 'Medium') AS \"Medium\", COUNT(*) FILTER (WHERE vs.severity = 'Low') AS \"Low\", COUNT(*) FILTER (WHERE vs.severity IS NULL OR vs.severity NOT IN ('Critical', 'High', 'Medium', 'Low')) AS \"Unknown\" FROM client_vulnerabilities cv LEFT JOIN vuln_details vd ON vd.vid = cv.vulnerability_id AND vd.vdom_id = cv.vdom_id LEFT JOIN vuln_severity vs ON vs.id = vd.severity AND vs.vdom_id = cv.vdom_id WHERE cv.vdom_id = 1 AND cv.patch_status = 0;",
         "refId": "A"
       }]
     },

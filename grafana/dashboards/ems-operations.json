@@ -4,7 +4,7 @@
   "description": "Synthetic checks for public and internal endpoints plus log-derived operational signals.",
   "tags": ["ems", "operations", "blackbox", "loki"],
   "schemaVersion": 39,
-  "version": 2,
+  "version": 8,
   "refresh": "30s",
   "time": { "from": "now-6h", "to": "now" },
   "timezone": "browser",
@@ -37,7 +37,7 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "Public HTTPS Checks Up",
+      "title": "Public HTTPS Checks Passing",
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
@@ -47,7 +47,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Internal HTTP Checks Up",
+      "title": "Internal HTTP Checks Passing",
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
@@ -57,21 +57,21 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Deploy Endpoint Up",
+      "title": "Deploy Health",
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://deploy:8010/\"}", "instant": true, "legendFormat": "", "refId": "A" }]
     },
     {
       "id": 4,
       "type": "stat",
-      "title": "Webserver Endpoint Up",
+      "title": "Webserver Health",
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" },
       "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://webserver:8000/\"}", "instant": true, "legendFormat": "", "refId": "A" }]
     },
     {
@@ -81,8 +81,13 @@
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=~\"blackbox-https|blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A" }]
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-https\", instance=\"https://nginx/\"}", "legendFormat": "Public Root", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-https\", instance=\"https://nginx/grafana/login\"}", "legendFormat": "Grafana Login", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://deploy:8010/\"}", "legendFormat": "Deploy API", "refId": "C" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_success{job=\"blackbox-http\", instance=\"http://webserver:8000/\"}", "legendFormat": "Webserver", "refId": "D" }
+      ]
     },
     {
       "id": 6,
@@ -91,21 +96,75 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "s" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=~\"blackbox-https|blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A" }]
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=\"blackbox-https\", instance=\"https://nginx/\"}", "legendFormat": "Public Root", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=\"blackbox-https\", instance=\"https://nginx/grafana/login\"}", "legendFormat": "Grafana Login", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=\"blackbox-http\", instance=\"http://deploy:8010/\"}", "legendFormat": "Deploy API", "refId": "C" },
+        { "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_duration_seconds{job=\"blackbox-http\", instance=\"http://webserver:8000/\"}", "legendFormat": "Webserver", "refId": "D" }
+      ]
     },
     {
       "id": 7,
-      "type": "table",
-      "title": "HTTP Status Codes",
+      "type": "bargauge",
+      "title": "HTTP Status Codes by Endpoint",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
-      "options": {
-        "sortBy": [{ "desc": false, "displayName": "Value" }],
-        "footer": { "show": false }
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 300 },
+              { "color": "red", "value": 400 }
+            ]
+          },
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
       },
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "probe_http_status_code{job=~\"blackbox-https|blackbox-http\"}", "instant": true, "legendFormat": "", "refId": "A" }]
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {},
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+          "expr": "probe_http_status_code{job=\"blackbox-https\", instance=\"https://nginx/\"}",
+          "instant": true,
+          "legendFormat": "Public Root",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+          "expr": "probe_http_status_code{job=\"blackbox-https\", instance=\"https://nginx/grafana/login\"}",
+          "instant": true,
+          "legendFormat": "Grafana Login",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+          "expr": "probe_http_status_code{job=\"blackbox-http\", instance=\"http://deploy:8010/\"}",
+          "instant": true,
+          "legendFormat": "Deploy API",
+          "refId": "C"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
+          "expr": "probe_http_status_code{job=\"blackbox-http\", instance=\"http://webserver:8000/\"}",
+          "instant": true,
+          "legendFormat": "Webserver",
+          "refId": "D"
+        }
+      ]
     },
     {
       "id": 8,
@@ -114,7 +173,7 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
         "expr": "sum by (service) (rate({project=~\"$project\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic|timeout|failed)\" [5m]))",

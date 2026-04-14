@@ -4,7 +4,7 @@
   "description": "FortiClient endpoint fleet summary — counts, online status, OS distribution, version spread, and registration activity.",
   "tags": ["ems", "fleet", "forticlient"],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 7,
   "refresh": "5m",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -172,8 +172,8 @@
         "overrides": []
       },
       "options": {
-        "pieType": "pie",
-        "displayLabels": ["name", "percent"],
+        "pieType": "donut",
+        "displayLabels": ["name", "value", "percent"],
         "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
         "tooltip": { "mode": "single" }
       },
@@ -183,31 +183,24 @@
         "editorMode": "code",
         "rawQuery": true,
         "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT d.os_type AS \"OS Type\", COUNT(*) AS \"Endpoints\" FROM devices d WHERE d.vdom_id = 1 AND d.os_type IS NOT NULL AND d.os_type != '' GROUP BY d.os_type ORDER BY \"Endpoints\" DESC;",
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE d.os_type LIKE 'WIN%') AS \"Windows\", COUNT(*) FILTER (WHERE d.os_type LIKE 'OSX%' OR d.os_type LIKE 'MAC%') AS \"macOS\", COUNT(*) FILTER (WHERE d.os_type LIKE 'LIN%') AS \"Linux\", COUNT(*) FILTER (WHERE d.os_type NOT LIKE 'WIN%' AND d.os_type NOT LIKE 'OSX%' AND d.os_type NOT LIKE 'MAC%' AND d.os_type NOT LIKE 'LIN%') AS \"Other\" FROM devices d WHERE d.vdom_id = 1 AND d.os_type IS NOT NULL AND d.os_type != '';",
         "refId": "A"
       }]
     },
     {
       "id": 7,
-      "type": "barchart",
+      "type": "table",
       "title": "FortiClient Version Distribution",
-      "description": "Sorted by version number (comparable_fct_version integer). Newest versions at top.",
+      "description": "Newest versions first, with endpoint counts per observed FortiClient release.",
       "gridPos": { "h": 8, "w": 16, "x": 8, "y": 4 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": { "fillOpacity": 80 }
-        },
-        "overrides": [
-          { "matcher": { "id": "byName", "options": "_sort" }, "properties": [{ "id": "custom.hidden", "value": true }] }
-        ]
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": []
       },
       "options": {
-        "orientation": "horizontal",
-        "xField": "Version",
-        "tooltip": { "mode": "single" },
-        "legend": { "displayMode": "hidden" }
+        "sortBy": [{ "desc": true, "displayName": "Endpoints" }],
+        "footer": { "show": false }
       },
       "targets": [{
         "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
@@ -215,7 +208,7 @@
         "editorMode": "code",
         "rawQuery": true,
         "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT f.fct_version_major_minor_patch AS \"Version\", COUNT(*) AS \"Endpoints\", MAX(f.comparable_fct_version) AS \"_sort\" FROM forticlients f WHERE f.vdom_id = 1 AND f.fct_version_major_minor_patch IS NOT NULL GROUP BY f.fct_version_major_minor_patch ORDER BY MAX(f.comparable_fct_version) DESC;",
+        "rawSql": "SELECT f.fct_version_major_minor_patch AS \"Version\", COUNT(*) AS \"Endpoints\" FROM forticlients f WHERE f.vdom_id = 1 AND f.fct_version_major_minor_patch IS NOT NULL GROUP BY f.fct_version_major_minor_patch ORDER BY MAX(f.comparable_fct_version) DESC;",
         "refId": "A"
       }]
     },

@@ -4,7 +4,7 @@
   "description": "High-level health for the EMS monitoring stack, ingress, probes, and busiest services.",
   "tags": ["ems", "stack", "prometheus", "overview"],
   "schemaVersion": 39,
-  "version": 2,
+  "version": 5,
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -86,7 +86,7 @@
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "count(up{job=~\"prometheus|node|cadvisor|loki|promtail|grafana|nginx|postgres|redis|pgbouncer|consul|blackbox-https|blackbox-http\"} == 0)",
+        "expr": "count(up{job=~\"prometheus|node|cadvisor|loki|promtail|grafana|nginx|postgres|redis|pgbouncer|consul|blackbox-https|blackbox-http\"}) - sum(up{job=~\"prometheus|node|cadvisor|loki|promtail|grafana|nginx|postgres|redis|pgbouncer|consul|blackbox-https|blackbox-http\"})",
         "instant": true,
         "legendFormat": "",
         "refId": "A"
@@ -151,7 +151,7 @@
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "count(probe_success{job=~\"blackbox-https|blackbox-http\"} == 0)",
+        "expr": "count(probe_success{job=~\"blackbox-https|blackbox-http\"}) - sum(probe_success{job=~\"blackbox-https|blackbox-http\"})",
         "instant": true,
         "legendFormat": "",
         "refId": "A"
@@ -173,7 +173,7 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
@@ -198,11 +198,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "topk(8, sum by (container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_project=~\"$project\", image!=\"\", container_label_com_docker_compose_service=~\"$service\"}[5m])))",
+        "expr": "topk(6, sum by (container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_project=~\"$project\", image!=\"\", container_label_com_docker_compose_service=~\"$service\"}[5m])))",
         "legendFormat": "{{container_label_com_docker_compose_service}}",
         "refId": "A"
       }]
@@ -223,11 +223,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "topk(8, sum by (container_label_com_docker_compose_service) (container_memory_working_set_bytes{container_label_com_docker_compose_project=~\"$project\", image!=\"\", container_label_com_docker_compose_service=~\"$service\"}))",
+        "expr": "topk(6, sum by (container_label_com_docker_compose_service) (container_memory_working_set_bytes{container_label_com_docker_compose_project=~\"$project\", image!=\"\", container_label_com_docker_compose_service=~\"$service\"}))",
         "legendFormat": "{{container_label_com_docker_compose_service}}",
         "refId": "A"
       }]
@@ -248,11 +248,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi" },
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
       },
       "targets": [{
         "datasource": { "type": "loki", "uid": "ems-loki" },
-        "expr": "sum by (service) (rate({project=~\"$project\"} |~ \"(?i)(error|exception|fatal|panic)\" [5m]))",
+        "expr": "topk(8, sum by (service) (rate({project=~\"$project\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic)\" [5m])))",
         "legendFormat": "{{service}}",
         "queryType": "range",
         "refId": "A"
@@ -260,23 +260,32 @@
     },
     {
       "id": 9,
-      "type": "table",
-      "title": "Scrape Target Health",
+      "type": "bargauge",
+      "title": "Scrape Jobs Up",
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
-        "defaults": { "custom": { "align": "auto" } },
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "short",
+          "min": 0
+        },
         "overrides": []
       },
       "options": {
-        "sortBy": [{ "desc": false, "displayName": "Value" }],
-        "footer": { "show": false }
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {},
+        "valueMode": "color"
       },
       "targets": [{
         "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
-        "expr": "up{job=~\"prometheus|node|cadvisor|loki|promtail|grafana|nginx|postgres|redis|pgbouncer|consul|blackbox-https|blackbox-http\"}",
+        "expr": "sort_desc(sum by (job) (up{job=~\"prometheus|node|cadvisor|loki|promtail|grafana|nginx|postgres|redis|pgbouncer|consul|blackbox-https|blackbox-http\"}))",
         "instant": true,
-        "legendFormat": "",
+        "legendFormat": "{{job}}",
         "refId": "A"
       }]
     }
