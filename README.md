@@ -14,6 +14,34 @@ Extends a containerised **FortiClient EMS v7.4.x** deployment with a fuller Graf
 
 Everything layers on top of Fortinet's existing containers via `docker-compose.override.yml`.
 
+## Screenshot Gallery
+
+Representative screenshots from the working stack are included under [`docs/screenshots/`](docs/screenshots/). Log-heavy views are intentionally omitted or redacted where they would otherwise expose request details or client addresses.
+
+<details>
+<summary>View dashboard screenshots</summary>
+
+### EMS views
+
+![EMS Fleet Overview](docs/screenshots/ems-fleet-overview.png)
+![EMS Security Posture](docs/screenshots/ems-security-posture.png)
+![EMS Policies & ZTNA](docs/screenshots/ems-policies-ztna.png)
+![EMS Admin & Licensing](docs/screenshots/ems-admin-licensing.png)
+
+### Platform views
+
+![EMS Stack Overview](docs/screenshots/ems-stack-overview.png)
+![EMS Host Health](docs/screenshots/ems-host-health.png)
+![EMS Datastores](docs/screenshots/ems-datastores.png)
+![EMS Containers](docs/screenshots/ems-containers.png)
+
+### Control plane views
+
+![EMS Control Plane](docs/screenshots/ems-control-plane.png)
+![EMS Reverse Proxy](docs/screenshots/ems-reverse-proxy.png)
+
+</details>
+
 ## Prerequisites
 
 - FortiClient EMS v7.4.7+ running via Docker Compose (the three observability containers — `promtail`, `loki`, `grafana` — must be healthy)
@@ -141,6 +169,8 @@ The `docker-compose.override.yml` and dashboard JSON files require no changes on
 FortiClientEMS-DockerDash/
 ├── docker-compose.override.yml           # Merged with Fortinet's compose file
 ├── .env.example                          # Template — copy to .env, never commit .env
+├── docs/
+│   └── screenshots/                      # Sanitised example dashboard screenshots
 ├── nginx/
 │   └── nginx.conf                        # EMS nginx config + Grafana proxy locations
 ├── grafana/
