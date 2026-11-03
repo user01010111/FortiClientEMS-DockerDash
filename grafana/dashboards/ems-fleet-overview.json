@@ -1,10 +1,10 @@
 {
   "title": "EMS Fleet Overview",
   "uid": "ems-fleet-overview",
-  "description": "FortiClient endpoint fleet summary — counts, online status, OS distribution, version spread, and registration activity.",
+  "description": "Your endpoint fleet at a glance: online status, operating systems, FortiClient versions and registration activity.",
   "tags": ["ems", "fleet", "forticlient"],
   "schemaVersion": 39,
-  "version": 7,
+  "version": 8,
   "refresh": "5m",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -16,10 +16,25 @@
   "templating": { "list": [] },
   "panels": [
     {
+      "id": 10,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Your endpoint fleet at a glance: online status, operating systems, FortiClient versions and registration activity."
+      }
+    },
+    {
       "id": 1,
       "type": "stat",
       "title": "Total Endpoints",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": {
@@ -47,7 +62,7 @@
       "id": 2,
       "type": "stat",
       "title": "Online",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": {
@@ -75,7 +90,7 @@
       "id": 3,
       "type": "stat",
       "title": "Offline",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": {
@@ -103,7 +118,7 @@
       "id": 4,
       "type": "stat",
       "title": "Quarantined",
-      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": {
@@ -137,7 +152,7 @@
       "id": 5,
       "type": "stat",
       "title": "AV Running",
-      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": {
@@ -165,7 +180,7 @@
       "id": 6,
       "type": "piechart",
       "title": "OS Distribution",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 7 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "palette-classic" } },
@@ -192,7 +207,7 @@
       "type": "table",
       "title": "FortiClient Version Distribution",
       "description": "Newest versions first, with endpoint counts per observed FortiClient release.",
-      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 4 },
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 7 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },
@@ -216,7 +231,7 @@
       "id": 8,
       "type": "table",
       "title": "Recently Registered Endpoints (last 7 days)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },
@@ -242,7 +257,7 @@
       "id": 9,
       "type": "table",
       "title": "Offline > 7 Days",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },

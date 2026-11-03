@@ -1,6 +1,5 @@
 .env
-*.tar
-*.tar.gz
-*.zip
-.DS_Store
-Thumbs.db
+.env.*
+!.env.example
+__pycache__/
+*.pyc

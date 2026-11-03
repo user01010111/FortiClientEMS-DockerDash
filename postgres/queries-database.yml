@@ -1,0 +1,48 @@
+ems_pg_maintenance:
+  query: "SELECT current_database() AS datname,\n      coalesce(sum(total_vacuum_time),0)/1000 AS vacuum_seconds_total,\n\
+    \      coalesce(sum(total_autovacuum_time),0)/1000 AS autovacuum_seconds_total,\n      coalesce(sum(total_analyze_time),0)/1000\
+    \ AS analyze_seconds_total,\n      coalesce(sum(total_autoanalyze_time),0)/1000 AS autoanalyze_seconds_total,\n\
+    \      count(*) AS tables, coalesce(sum(n_live_tup),0) AS estimated_live_rows,\n      coalesce(sum(n_dead_tup),0)\
+    \ AS estimated_dead_rows,\n      coalesce(sum(n_mod_since_analyze),0) AS modified_since_analyze\n      FROM\
+    \ pg_stat_user_tables WHERE schemaname='public' "
+  metrics:
+  - datname:
+      usage: LABEL
+      description: datname
+  - vacuum_seconds_total:
+      usage: COUNTER
+      description: vacuum seconds total
+  - autovacuum_seconds_total:
+      usage: COUNTER
+      description: autovacuum seconds total
+  - analyze_seconds_total:
+      usage: COUNTER
+      description: analyze seconds total
+  - autoanalyze_seconds_total:
+      usage: COUNTER
+      description: autoanalyze seconds total
+  - tables:
+      usage: GAUGE
+      description: tables
+  - estimated_live_rows:
+      usage: GAUGE
+      description: estimated live rows
+  - estimated_dead_rows:
+      usage: GAUGE
+      description: estimated dead rows
+  - modified_since_analyze:
+      usage: GAUGE
+      description: modified since analyze
+ems_pg_vacuum:
+  query: "SELECT current_database() AS datname, phase, count(*) AS active\n      FROM pg_stat_progress_vacuum WHERE\
+    \ datname=current_database() GROUP BY phase"
+  metrics:
+  - datname:
+      usage: LABEL
+      description: datname
+  - phase:
+      usage: LABEL
+      description: phase
+  - active:
+      usage: GAUGE
+      description: active

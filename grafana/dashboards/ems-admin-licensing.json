@@ -1,165 +1,1041 @@
 {
   "title": "EMS Admin & Licensing",
   "uid": "ems-admin-licensing",
-  "description": "Administrative users, login activity, alerts, upgrade metadata, and license catalogue from the EMS control database.",
-  "tags": ["ems", "admin", "licensing", "sql"],
+  "description": "Administrative users, login activity, licences and hotfix schedules in one place.",
+  "tags": [
+    "ems",
+    "admin",
+    "licensing",
+    "sql"
+  ],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 7,
   "refresh": "5m",
-  "time": { "from": "now-30d", "to": "now" },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
   "timezone": "browser",
   "graphTooltip": 1,
   "editable": true,
   "fiscalYearStartMonth": 0,
   "links": [],
-  "annotations": { "list": [] },
-  "templating": { "list": [] },
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
   "panels": [
+    {
+      "id": 16,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Administrative users, login activity, licences and hotfix schedules in one place."
+      }
+    },
     {
       "id": 1,
       "type": "stat",
       "title": "Admin Users",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Admin Users\" FROM admin_user;", "refId": "A" }]
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 3
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT COUNT(*) AS \"Admin Users\" FROM admin_user;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 2,
       "type": "stat",
       "title": "Enabled Admins",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Enabled Admins\" FROM admin_user WHERE disabled = 0 AND inactive = false;", "refId": "A" }]
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 3
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT COUNT(*) AS \"Enabled Admins\" FROM admin_user WHERE disabled = 0 AND inactive = false;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 3,
       "type": "stat",
       "title": "Failed Logins (7d)",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Failed Logins (7d)\" FROM admin_user_login_attempts WHERE successful = false AND login_time >= NOW() - INTERVAL '7 days';", "refId": "A" }]
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 3
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT COUNT(*) AS \"Failed Logins (7d)\" FROM admin_user_login_attempts WHERE successful = false AND login_time >= NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 4,
       "type": "stat",
       "title": "Successful Logins (7d)",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" }, "format": "table", "editorMode": "code", "rawQuery": true, "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 }, "rawSql": "SELECT COUNT(*) AS \"Successful Logins (7d)\" FROM admin_user_login_attempts WHERE successful = true AND login_time >= NOW() - INTERVAL '7 days';", "refId": "A" }]
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 3
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT COUNT(*) AS \"Successful Logins (7d)\" FROM admin_user_login_attempts WHERE successful = true AND login_time >= NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 5,
       "type": "table",
       "title": "Admin Users",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 7
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
       "fieldConfig": {
-        "defaults": { "custom": { "align": "auto" } },
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Last Active" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Active"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          }
         ]
       },
-      "options": { "sortBy": [{ "desc": false, "displayName": "Admin" }], "footer": { "show": false } },
-      "targets": [{
-        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-        "format": "table",
-        "editorMode": "code",
-        "rawQuery": true,
-        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT name AS \"Admin\", display_name AS \"Display Name\", disabled AS \"Disabled\", inactive AS \"Inactive\", last_active_time AS \"Last Active\", role_uid AS \"Role UID\" FROM admin_user ORDER BY name;",
-        "refId": "A"
-      }]
+      "options": {
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Admin"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT name AS \"Admin\", display_name AS \"Display Name\", disabled AS \"Disabled\", inactive AS \"Inactive\", last_active_time AS \"Last Active\", role_uid AS \"Role UID\" FROM admin_user ORDER BY name;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 6,
       "type": "table",
       "title": "Recent Login Attempts",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 7
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
       "fieldConfig": {
-        "defaults": { "custom": { "align": "auto" } },
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Time" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          }
         ]
       },
-      "options": { "sortBy": [{ "desc": true, "displayName": "Time" }], "footer": { "show": false } },
-      "targets": [{
-        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-        "format": "table",
-        "editorMode": "code",
-        "rawQuery": true,
-        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT login_time AS \"Time\", login_name AS \"Login\", login_ip AS \"IP\", successful AS \"Successful\", login_domain AS \"Domain\" FROM admin_user_login_attempts ORDER BY login_time DESC LIMIT 100;",
-        "refId": "A"
-      }]
+      "options": {
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT login_time AS \"Time\", login_name AS \"Login\", login_ip AS \"IP\", successful AS \"Successful\", login_domain AS \"Domain\" FROM admin_user_login_attempts ORDER BY login_time DESC LIMIT 100;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 7,
       "type": "table",
       "title": "EMS Alerts",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
       "fieldConfig": {
-        "defaults": { "custom": { "align": "auto" } },
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "Created" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] },
-          { "matcher": { "id": "byName", "options": "Most Recent" }, "properties": [{ "id": "unit", "value": "dateTimeAsIso" }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Created"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Most Recent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          }
         ]
       },
-      "options": { "sortBy": [{ "desc": true, "displayName": "Most Recent" }], "footer": { "show": false } },
-      "targets": [{
-        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-        "format": "table",
-        "editorMode": "code",
-        "rawQuery": true,
-        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT created AS \"Created\", most_recent AS \"Most Recent\", message AS \"Alert\", count AS \"Count\" FROM ems_alerts ORDER BY COALESCE(most_recent, created) DESC LIMIT 100;",
-        "refId": "A"
-      }]
+      "options": {
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Most Recent"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT created AS \"Created\", most_recent AS \"Most Recent\", message AS \"Alert\", count AS \"Count\" FROM ems_alerts ORDER BY COALESCE(most_recent, created) DESC LIMIT 100;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 8,
       "type": "table",
       "title": "Upgrade Catalogue",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
-      "options": { "sortBy": [{ "desc": true, "displayName": "Sortable Version" }], "footer": { "show": false } },
-      "targets": [{
-        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-        "format": "table",
-        "editorMode": "code",
-        "rawQuery": true,
-        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT version AS \"Version\", comparable_version AS \"Sortable Version\", fixes_critical_vulns AS \"Fixes Critical Vulns\", upgrade_from::text AS \"Upgrade From\", platforms::text AS \"Platforms\" FROM ems_upgrade_config ORDER BY comparable_version DESC LIMIT 50;",
-        "refId": "A"
-      }]
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Sortable Version"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT version AS \"Version\", comparable_version AS \"Sortable Version\", fixes_critical_vulns AS \"Fixes Critical Vulns\", upgrade_from::text AS \"Upgrade From\", platforms::text AS \"Platforms\" FROM ems_upgrade_config ORDER BY comparable_version DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ]
     },
     {
       "id": 9,
       "type": "table",
       "title": "License Catalogue",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
-      "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
-      "options": { "sortBy": [{ "desc": false, "displayName": "ID" }], "footer": { "show": false } },
-      "targets": [{
-        "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm" },
-        "format": "table",
-        "editorMode": "code",
-        "rawQuery": true,
-        "sql": { "columns": [{ "type": "function", "parameters": [] }], "groupBy": [{ "type": "groupBy", "property": { "type": "string" } }], "limit": 50 },
-        "rawSql": "SELECT id AS \"ID\", name AS \"License\" FROM license_version ORDER BY id;",
-        "refId": "A"
-      }]
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "ID"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "sql": {
+            "columns": [
+              {
+                "type": "function",
+                "parameters": []
+              }
+            ],
+            "groupBy": [
+              {
+                "type": "groupBy",
+                "property": {
+                  "type": "string"
+                }
+              }
+            ],
+            "limit": 50
+          },
+          "rawSql": "SELECT id AS \"ID\", name AS \"License\" FROM license_version ORDER BY id;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Automatic hotfixing enabled",
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Disabled"
+                },
+                "1": {
+                  "text": "Enabled"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "refId": "A",
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "rawSql": "SELECT auto_hotfix_enabled::int AS \"Enabled\" FROM system_settings_v2;"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Hotfix schedules",
+      "gridPos": {
+        "x": 6,
+        "y": 31,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "refId": "A",
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) FILTER(WHERE hotfix_scheduled_date IS NOT NULL) AS \"Scheduled\" FROM hotfix_info;"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Hotfix advertised",
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "refId": "A",
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) FILTER(WHERE hotfix_available IS NOT NULL AND hotfix_available NOT IN ('','[]','null','0')) AS \"Advertised\" FROM hotfix_info;"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Hotfix catalogue rows",
+      "gridPos": {
+        "x": 18,
+        "y": 31,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "refId": "A",
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS \"Rows\" FROM hotfix_info;"
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Hotfix availability and schedule",
+      "gridPos": {
+        "x": 0,
+        "y": 35,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ems-fcm"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          },
+          "unit": "short",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Installed On"
+          }
+        ],
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ems-fcm"
+          },
+          "refId": "A",
+          "format": "table",
+          "editorMode": "code",
+          "rawQuery": true,
+          "rawSql": "SELECT hotfix_available AS \"Available\",hotfix_scheduled_date AS \"Scheduled (UTC)\",is_auto AS \"Automatic\" FROM hotfix_info ORDER BY hotfix_scheduled_date NULLS LAST;"
+        }
+      ],
+      "description": ""
     }
   ]
 }

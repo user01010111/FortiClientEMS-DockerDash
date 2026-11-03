@@ -22,28 +22,28 @@ datasources:
     uid: ems-fcm
     type: postgres
     access: proxy
-    url: "${EMS_DB_HOST}:${EMS_DB_PORT}"
+    url: "$EMS_DB_HOST:$EMS_DB_PORT"
     database: fcm
-    user: "${EMS_DB_USER}"
+    user: "$EMS_DB_USER"
     secureJsonData:
-      password: "${EMS_DB_PASSWORD}"
+      password: "$EMS_DB_PASSWORD"
     jsonData:
       database: fcm
       sslmode: disable
-      postgresVersion: 1500
+      postgresVersion: 1800
       timescaledb: false
 
   - name: fcm_default
     uid: ems-fcm-default
     type: postgres
     access: proxy
-    url: "${EMS_DB_HOST}:${EMS_DB_PORT}"
+    url: "$EMS_DB_HOST:$EMS_DB_PORT"
     database: fcm_default
-    user: "${EMS_DB_USER}"
+    user: "$EMS_DB_USER"
     secureJsonData:
-      password: "${EMS_DB_PASSWORD}"
+      password: "$EMS_DB_PASSWORD"
     jsonData:
       database: fcm_default
       sslmode: disable
-      postgresVersion: 1500
+      postgresVersion: 1800
       timescaledb: false

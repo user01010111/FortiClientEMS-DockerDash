@@ -1,10 +1,10 @@
 {
   "title": "EMS Host Health",
   "uid": "ems-host-health",
-  "description": "Host CPU, memory, filesystem, disk, and network health from node-exporter.",
+  "description": "CPU, memory, storage and network activity on the Linux host running EMS.",
   "tags": ["ems", "host", "node-exporter"],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 4,
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -16,10 +16,25 @@
   "templating": { "list": [] },
   "panels": [
     {
+      "id": 9,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "CPU, memory, storage and network activity on the Linux host running EMS."
+      }
+    },
+    {
       "id": 1,
       "type": "stat",
       "title": "CPU Used %",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -52,7 +67,7 @@
       "id": 2,
       "type": "stat",
       "title": "Memory Used %",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -85,7 +100,7 @@
       "id": 3,
       "type": "stat",
       "title": "Root FS Used %",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -118,7 +133,7 @@
       "id": 4,
       "type": "stat",
       "title": "15m Load",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -144,7 +159,7 @@
       "id": 5,
       "type": "timeseries",
       "title": "CPU and Load",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -189,7 +204,7 @@
       "id": 6,
       "type": "timeseries",
       "title": "Network Throughput",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -222,7 +237,7 @@
       "id": 7,
       "type": "timeseries",
       "title": "Disk Throughput",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -256,7 +271,7 @@
       "type": "bargauge",
       "title": "Filesystem Usage",
       "description": "Used capacity by mountpoint. Docker scratch mounts and tmpfs-style filesystems are excluded.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {

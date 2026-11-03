@@ -1,10 +1,10 @@
 {
   "title": "EMS Service Logs",
   "uid": "ems-service-logs",
-  "description": "Real-time log streams and error rates from all EMS microservices via Loki. Use the service and level variables to filter.",
+  "description": "EMS service logs, log volumes and error trends. Filter by service and level to investigate an event.",
   "tags": ["ems", "logs", "loki", "observability"],
   "schemaVersion": 39,
-  "version": 8,
+  "version": 10,
   "refresh": "30s",
   "time": { "from": "now-1h", "to": "now" },
   "timezone": "browser",
@@ -19,8 +19,8 @@
         "name": "project",
         "label": "Compose Project Regex",
         "type": "textbox",
-        "query": "ems-.*",
-        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "query": ".+",
+        "current": { "text": ".+", "value": ".+" },
         "hide": 0
       },
       {
@@ -58,11 +58,26 @@
   },
   "panels": [
     {
+      "id": 5,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "EMS service logs, log volumes and error trends. Filter by service and level to investigate an event."
+      }
+    },
+    {
       "id": 1,
       "type": "timeseries",
       "title": "Log Volume per Service",
       "description": "Lines per second per service. Spikes may indicate increased activity or log verbosity changes.",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 3 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": {
         "defaults": {
@@ -89,7 +104,7 @@
       "type": "timeseries",
       "title": "Error Rate per Service",
       "description": "Lines matching error|exception|fatal|panic per second, per service.",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 11 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": {
         "defaults": {
@@ -116,7 +131,7 @@
       "type": "table",
       "title": "Top Error-Producing Services (last hour)",
       "description": "Services ranked by total error-level log lines in the last hour.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 11 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },
@@ -139,7 +154,7 @@
       "type": "logs",
       "title": "Live Log Stream — $service",
       "description": "Filtered by service variable. Use level variable to narrow to a specific log level keyword.",
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 16 },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 19 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": { "defaults": {}, "overrides": [] },
       "options": {

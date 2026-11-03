@@ -1,10 +1,10 @@
 {
   "title": "EMS Reverse Proxy",
   "uid": "ems-reverse-proxy",
-  "description": "nginx active connections, traffic, container resources, and log flow.",
+  "description": "nginx connections, request rates, resource use and logs for the EMS web front end.",
   "tags": ["ems", "nginx", "reverse-proxy"],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 5,
   "refresh": "30s",
   "time": { "from": "now-6h", "to": "now" },
   "timezone": "browser",
@@ -19,18 +19,33 @@
         "name": "project",
         "label": "Compose Project Regex",
         "type": "textbox",
-        "query": "ems-.*",
-        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "query": ".+",
+        "current": { "text": ".+", "value": ".+" },
         "hide": 0
       }
     ]
   },
   "panels": [
     {
+      "id": 9,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "nginx connections, request rates, resource use and logs for the EMS web front end."
+      }
+    },
+    {
       "id": 1,
       "type": "stat",
       "title": "Active Connections",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" },
@@ -43,7 +58,7 @@
       "id": 2,
       "type": "stat",
       "title": "Requests / s",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" },
@@ -56,7 +71,7 @@
       "id": 3,
       "type": "stat",
       "title": "nginx CPU",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "cores" },
@@ -69,7 +84,7 @@
       "id": 4,
       "type": "stat",
       "title": "nginx Memory",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "bytes" },
@@ -82,7 +97,7 @@
       "id": 5,
       "type": "timeseries",
       "title": "Connection States",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
@@ -100,7 +115,7 @@
       "id": 6,
       "type": "timeseries",
       "title": "Requests per Second",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
@@ -113,7 +128,7 @@
       "id": 7,
       "type": "timeseries",
       "title": "nginx Log Warnings and Errors",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": {
         "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" },
@@ -132,7 +147,7 @@
       "id": 8,
       "type": "logs",
       "title": "Live nginx Logs",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "datasource": { "type": "loki", "uid": "ems-loki" },
       "fieldConfig": { "defaults": {}, "overrides": [] },
       "options": {

@@ -5,7 +5,6 @@ modules:
     http:
       method: GET
       preferred_ip_protocol: ip4
-
   http_2xx_insecure:
     prober: http
     timeout: 5s
@@ -14,3 +13,8 @@ modules:
       preferred_ip_protocol: ip4
       tls_config:
         insecure_skip_verify: true
+  tcp_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4

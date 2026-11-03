@@ -1,10 +1,10 @@
 {
   "title": "EMS Policies & ZTNA",
   "uid": "ems-policies-ztna",
-  "description": "Policy distribution, tags, and ZTNA certificate state from the endpoint telemetry database.",
+  "description": "Policy distribution, endpoint tags and ZTNA certificate status across your fleet.",
   "tags": ["ems", "policies", "ztna", "sql"],
   "schemaVersion": 39,
-  "version": 4,
+  "version": 5,
   "refresh": "5m",
   "time": { "from": "now-30d", "to": "now" },
   "timezone": "browser",
@@ -16,10 +16,25 @@
   "templating": { "list": [] },
   "panels": [
     {
+      "id": 9,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Policy distribution, endpoint tags and ZTNA certificate status across your fleet."
+      }
+    },
+    {
       "id": 1,
       "type": "stat",
       "title": "Policies",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
@@ -29,7 +44,7 @@
       "id": 2,
       "type": "stat",
       "title": "Enabled Policies",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
@@ -39,7 +54,7 @@
       "id": 3,
       "type": "stat",
       "title": "Tagged Endpoints",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
@@ -49,7 +64,7 @@
       "id": 4,
       "type": "stat",
       "title": "ZTNA Cert Records",
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 3 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" }, "overrides": [] },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none" },
@@ -59,7 +74,7 @@
       "id": 5,
       "type": "table",
       "title": "Policy Distribution",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
       "options": { "sortBy": [{ "desc": true, "displayName": "Latest Users" }], "footer": { "show": false } },
@@ -77,7 +92,7 @@
       "id": 6,
       "type": "table",
       "title": "Latest Endpoint Sessions",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },
@@ -100,7 +115,7 @@
       "id": 7,
       "type": "table",
       "title": "Tag Distribution",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
       "options": { "sortBy": [{ "desc": true, "displayName": "Assignments" }], "footer": { "show": false } },
@@ -118,7 +133,7 @@
       "id": 8,
       "type": "table",
       "title": "ZTNA Certificate Status",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
       "datasource": { "type": "grafana-postgresql-datasource", "uid": "ems-fcm-default" },
       "fieldConfig": {
         "defaults": { "custom": { "align": "auto" } },

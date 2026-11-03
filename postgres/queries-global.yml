@@ -1,0 +1,101 @@
+ems_pg_io:
+  query: "SELECT backend_type, object, context,\n      coalesce(reads,0) AS reads_total, coalesce(read_bytes,0)\
+    \ AS read_bytes_total,\n      coalesce(writes,0) AS writes_total, coalesce(write_bytes,0) AS write_bytes_total,\n\
+    \      coalesce(fsyncs,0) AS fsyncs_total, coalesce(read_time,0)/1000 AS read_seconds_total,\n      coalesce(write_time,0)/1000\
+    \ AS write_seconds_total, coalesce(fsync_time,0)/1000 AS fsync_seconds_total,\n      coalesce(hits,0) AS hits_total,\
+    \ coalesce(evictions,0) AS evictions_total FROM pg_stat_io"
+  metrics:
+  - backend_type:
+      usage: LABEL
+      description: backend type
+  - object:
+      usage: LABEL
+      description: object
+  - context:
+      usage: LABEL
+      description: context
+  - reads_total:
+      usage: COUNTER
+      description: reads total
+  - read_bytes_total:
+      usage: COUNTER
+      description: read bytes total
+  - writes_total:
+      usage: COUNTER
+      description: writes total
+  - write_bytes_total:
+      usage: COUNTER
+      description: write bytes total
+  - fsyncs_total:
+      usage: COUNTER
+      description: fsyncs total
+  - read_seconds_total:
+      usage: COUNTER
+      description: read seconds total
+  - write_seconds_total:
+      usage: COUNTER
+      description: write seconds total
+  - fsync_seconds_total:
+      usage: COUNTER
+      description: fsync seconds total
+  - hits_total:
+      usage: COUNTER
+      description: hits total
+  - evictions_total:
+      usage: COUNTER
+      description: evictions total
+ems_pg_wal:
+  query: "SELECT wal_records AS records_total, wal_fpi AS full_page_images_total,\n      wal_bytes AS bytes_total,\
+    \ wal_buffers_full AS buffers_full_total FROM pg_stat_wal"
+  metrics:
+  - records_total:
+      usage: COUNTER
+      description: records total
+  - full_page_images_total:
+      usage: COUNTER
+      description: full page images total
+  - bytes_total:
+      usage: COUNTER
+      description: bytes total
+  - buffers_full_total:
+      usage: COUNTER
+      description: buffers full total
+ems_pg_checkpoint:
+  query: SELECT num_done AS completed_total, slru_written AS slru_written_total FROM pg_stat_checkpointer
+  metrics:
+  - completed_total:
+      usage: COUNTER
+      description: completed total
+  - slru_written_total:
+      usage: COUNTER
+      description: slru written total
+ems_pg_parallel:
+  query: SELECT datname, parallel_workers_to_launch AS requested_total, parallel_workers_launched AS launched_total
+    FROM pg_stat_database WHERE datname IN ('fcm','fcm_default')
+  metrics:
+  - datname:
+      usage: LABEL
+      description: datname
+  - requested_total:
+      usage: COUNTER
+      description: requested total
+  - launched_total:
+      usage: COUNTER
+      description: launched total
+ems_pg_features:
+  query: "SELECT current_setting('track_io_timing')::boolean::int AS io_timing,\n      current_setting('track_wal_io_timing')::boolean::int\
+    \ AS wal_io_timing,\n      current_setting('track_cost_delay_timing')::boolean::int AS vacuum_delay_timing,\n\
+    \      (strpos(current_setting('shared_preload_libraries'),'pg_stat_statements')>0)::int AS statements_preloaded"
+  metrics:
+  - io_timing:
+      usage: GAUGE
+      description: io timing
+  - wal_io_timing:
+      usage: GAUGE
+      description: wal io timing
+  - vacuum_delay_timing:
+      usage: GAUGE
+      description: vacuum delay timing
+  - statements_preloaded:
+      usage: GAUGE
+      description: statements preloaded

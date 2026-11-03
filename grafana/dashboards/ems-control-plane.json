@@ -1,10 +1,10 @@
 {
   "title": "EMS Control Plane",
   "uid": "ems-control-plane",
-  "description": "Health and resource profile for Grafana, Prometheus, Loki, Promtail, Consul, and probes.",
+  "description": "Health and resource use for Grafana, Prometheus, Loki, Promtail and Consul, alongside service probes.",
   "tags": ["ems", "control-plane", "prometheus"],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 5,
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
   "timezone": "browser",
@@ -19,24 +19,39 @@
         "name": "project",
         "label": "Compose Project Regex",
         "type": "textbox",
-        "query": "ems-.*",
-        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "query": ".+",
+        "current": { "text": ".+", "value": ".+" },
         "hide": 0
       }
     ]
   },
   "panels": [
-    { "id": 1, "type": "stat", "title": "Grafana Up", "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"grafana\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
-    { "id": 2, "type": "stat", "title": "Loki Up", "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"loki\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
-    { "id": 3, "type": "stat", "title": "Promtail Up", "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"promtail\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
-    { "id": 4, "type": "stat", "title": "Prometheus Up", "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"prometheus\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
-    { "id": 5, "type": "stat", "title": "Consul Up", "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"consul\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
-    { "id": 6, "type": "stat", "title": "Blackbox Checks Passing", "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "count(up{job=~\"blackbox-https|blackbox-http\"} == 1)", "instant": true, "legendFormat": "", "refId": "A" }] },
+    {
+      "id": 10,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Health and resource use for Grafana, Prometheus, Loki, Promtail and Consul, alongside service probes."
+      }
+    },
+    { "id": 1, "type": "stat", "title": "Grafana Up", "gridPos": { "h": 4, "w": 4, "x": 0, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"grafana\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
+    { "id": 2, "type": "stat", "title": "Loki Up", "gridPos": { "h": 4, "w": 4, "x": 4, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"loki\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
+    { "id": 3, "type": "stat", "title": "Promtail Up", "gridPos": { "h": 4, "w": 4, "x": 8, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"promtail\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
+    { "id": 4, "type": "stat", "title": "Prometheus Up", "gridPos": { "h": 4, "w": 4, "x": 12, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"prometheus\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
+    { "id": 5, "type": "stat", "title": "Consul Up", "gridPos": { "h": 4, "w": 4, "x": 16, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [{ "type": "value", "options": { "0": { "text": "Down" }, "1": { "text": "Up" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "none" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "up{job=\"consul\"}", "instant": true, "legendFormat": "", "refId": "A" }] },
+    { "id": 6, "type": "stat", "title": "Blackbox Checks Passing", "gridPos": { "h": 4, "w": 4, "x": 20, "y": 3 }, "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }, "unit": "short" }, "overrides": [] }, "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "background", "graphMode": "none" }, "targets": [{ "datasource": { "type": "prometheus", "uid": "ems-prometheus" }, "expr": "count(up{job=~\"blackbox-https|blackbox-http\"} == 1)", "instant": true, "legendFormat": "", "refId": "A" }] },
     {
       "id": 7,
       "type": "timeseries",
       "title": "Scrape Samples",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "short" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -46,7 +61,7 @@
       "id": 8,
       "type": "timeseries",
       "title": "Control Plane CPU",
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 4 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "cores" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -56,7 +71,7 @@
       "id": 9,
       "type": "timeseries",
       "title": "Control Plane Memory",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 4 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 7 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "bytes" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },

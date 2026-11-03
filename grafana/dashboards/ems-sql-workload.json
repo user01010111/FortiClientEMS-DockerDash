@@ -1,0 +1,672 @@
+{
+  "title": "EMS SQL Workload",
+  "uid": "ems-sql-workload",
+  "description": "Database calls, execution time and I/O, with query profiles highlighting the busiest SQL workloads.",
+  "tags": [
+    "ems",
+    "postgresql18",
+    "monitoring"
+  ],
+  "schemaVersion": 39,
+  "version": 4,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "utc",
+  "graphTooltip": 1,
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "links": [],
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Database calls, execution time and I/O, with query profiles highlighting the busiest SQL workloads."
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Profiling enabled",
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "ems_pg_features_statements_preloaded",
+          "legendFormat": "",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Collected EMS query profiles",
+      "gridPos": {
+        "x": 6,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "count(pg_stat_statements_calls_total{datname=~\"fcm|fcm_default\"}) or vector(0)",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Calls per second",
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(rate(pg_stat_statements_calls_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Execution seconds per second",
+      "gridPos": {
+        "x": 18,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "suffix:s/s",
+          "noValue": "No samples"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "sum(rate(pg_stat_statements_seconds_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Calls by database",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "ops",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (datname) (rate(pg_stat_statements_calls_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Execution time by database",
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "suffix:s/s",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (datname) (rate(pg_stat_statements_seconds_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Most execution time by query ID",
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "suffix:s/s",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "topk(10, rate(pg_stat_statements_seconds_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Average execution time by query ID",
+      "gridPos": {
+        "x": 12,
+        "y": 15,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "s",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "topk(10, rate(pg_stat_statements_seconds_total{datname=~\"fcm|fcm_default\"}[5m]) / rate(pg_stat_statements_calls_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Rows processed by query ID",
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "ops",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "topk(10, rate(pg_stat_statements_rows_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} {{queryid}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Statement I/O time",
+      "gridPos": {
+        "x": 12,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ems-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "suffix:s/s",
+          "noValue": "No samples",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "A",
+          "expr": "sum by (datname) (rate(pg_stat_statements_block_read_seconds_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} read",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ems-prometheus"
+          },
+          "refId": "B",
+          "expr": "sum by (datname) (rate(pg_stat_statements_block_write_seconds_total{datname=~\"fcm|fcm_default\"}[5m]))",
+          "legendFormat": "{{datname}} write",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "description": ""
+    }
+  ]
+}

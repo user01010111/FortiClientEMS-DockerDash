@@ -1,0 +1,291 @@
+server {
+    listen $SERVERSSLPORT ssl; # SERVERSSLPORT
+    # cloud_setup_tool - listen;
+    listen 9443 ssl proxy_protocol;
+    server_name _;
+
+    ssl_certificate $EMS_SSL_CERT;
+    ssl_certificate_key $EMS_SSL_KEY;
+    ssl_client_certificate /opt/forticlientems/data/certs/fortinet_ca_root_all.crt;
+    ssl_trusted_certificate /opt/forticlientems/data/certs/fortinet_ca_root_all.crt;
+    ssl_verify_client optional;
+    ssl_verify_depth 10;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-GCM-SHA256:!aNULL:!MD5:!DSS:!RC4:!RSA";
+    ssl_session_tickets off;
+    client_max_body_size 0;
+
+    # docker only
+    set_real_ip_from 0.0.0.0/0;    # Trust all, but be cautious
+    # cloud_setup_tool - real_ip_header;
+    real_ip_header proxy_protocol;
+
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'self' https://www.fortiguard.com/; frame-ancestors 'self' https://*.forticloud.com;" always;
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    location /ai/ {
+        proxy_pass http://fcems_aigateway/;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_buffering off;
+        proxy_read_timeout 3600;
+    }
+
+    # Metrics are scraped directly inside Docker, never through the EMS HTTPS endpoint.
+    location = /grafana/metrics {
+        return 404;
+    }
+
+    # Full Grafana access through the existing EMS HTTPS listener.
+    location = /grafana {
+        return 301 /grafana/;
+    }
+
+        location /grafana/ {
+            add_header Content-Security-Policy "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; frame-ancestors 'self';" always;
+            add_header X-Frame-Options SAMEORIGIN always;
+            add_header X-Content-Type-Options nosniff always;
+            add_header X-XSS-Protection "1; mode=block" always;
+            add_header Strict-Transport-Security "max-age=31536000" always;
+            proxy_pass         http://grafana:3000/grafana/;
+            proxy_set_header   Host              $host;
+            proxy_set_header   X-Real-IP         $remote_addr;
+            proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Proto $scheme;
+            proxy_set_header   X-Forwarded-Port  $server_port;
+            proxy_set_header   X-Forwarded-Host  $host;
+            proxy_read_timeout    600;
+            proxy_connect_timeout 600;
+        }
+
+        # WebSocket endpoint required by Grafana Live (real-time panel updates).
+        location /grafana/api/live/ {
+            add_header Content-Security-Policy "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; frame-ancestors 'self';" always;
+            add_header X-Frame-Options SAMEORIGIN always;
+            add_header X-Content-Type-Options nosniff always;
+            add_header X-XSS-Protection "1; mode=block" always;
+            add_header Strict-Transport-Security "max-age=31536000" always;
+            proxy_pass         http://grafana:3000/grafana/api/live/;
+            proxy_http_version 1.1;
+            proxy_set_header   Upgrade           $http_upgrade;
+            proxy_set_header   Connection        "upgrade";
+            proxy_set_header   Host              $host;
+            proxy_set_header   X-Real-IP         $remote_addr;
+            proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Proto $scheme;
+            proxy_read_timeout 3600;
+        }
+
+    location /scim {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # For POST/PUT
+        client_max_body_size 10M;
+        proxy_http_version 1.1;
+
+        # remove trailing forward slash
+        rewrite ^/scim(?<subpath>.*?)/?$ /scim$subpath break;
+        proxy_pass http://localhost:7643;
+}
+
+    location / {
+        include /etc/nginx/includes/common_proxy_headers.conf;
+        proxy_pass http://fcems_webserver;
+        proxy_set_header Origin https://$EMS_WEB_HOST;
+
+        # Rewrite Set-Cookie Domain to the client's original request domain
+        proxy_cookie_domain $EMS_WEB_HOST $host;
+
+        # 1340395 If the webserver is unreachable (e.g. fcems_webserver restarting): return a JSON
+        # envelope that the GUI can recognise instead of nginx's stock error page.
+        error_page 502 504 = @ems_upstream_down_json;
+    }
+
+    location @ems_upstream_down_json {
+        default_type application/json;
+
+        # retval BAD_GATEWAY_ERROR
+        return 502 '{"result":{"retval":-9,"message":"The webserver did not respond. It may be restarting. Please try again in a moment."},"data":null}';
+    }
+
+    # Comment out everything between *** ztnaworker *** to fall back to processing FOS API in webserver
+
+    # ************************** ztnaworker ***************************************
+    location /api/v1/report/fct/tags {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+        proxy_set_header X-Forward-To-ZTNAWorker "1";
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/tags(.*)$ /tags$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/report/fct/sysinfo {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+        proxy_set_header X-Forward-To-ZTNAWorker "1";
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/sysinfo(.*)$ /sysinfo$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/fgt/gateway_details/vpn {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/fgt/gateway_details/vpn(.*)$ /vpn/app$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/fgt/gateway_details/gateway_mac {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/fgt/gateway_details/gateway_mac(.*)$ /gateway_mac$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/malware/hash {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/malware/hash(.*)$ /malware/hash$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/report/fct/uid_tags {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+        proxy_set_header X-Forward-To-ZTNAWorker "1";
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/uid_tags(.*)$ /uid_tags$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/fabric/tag_list {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/fabric/tag_list(.*)$ /tag_list$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/report/fct/vuln {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+        proxy_set_header X-Forward-To-ZTNAWorker "1";
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/vuln(.*)$ /vuln$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/report/fct/subscribe {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/subscribe(.*)$ /subscribe$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    location /api/v1/report/fct/security_posture {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+        proxy_set_header X-Forward-To-ZTNAWorker "1";
+
+        if ($ssl_client_verify = SUCCESS) {
+            rewrite ^/api/v1/report/fct/security_posture(.*)$ /security_posture$1 break;
+            proxy_pass http://fcems_ztna;
+        }
+
+        if ($ssl_client_verify != SUCCESS) {
+            proxy_pass http://fcems_webserver;
+        }
+    }
+
+    # base CRL and ZTNA cert are available for anyone, while delta CRL - for authorized clients only (FOS)
+    location /api/v1/ztna_certificates/crl/download/delta {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        rewrite ^/api/v1/ztna_certificates/crl/download/delta$ /crl/download/delta break;
+        proxy_pass http://fcems_ztna;
+    }
+
+    location /api/v1/ztna_certificates/crl/download/base {
+        include /etc/nginx/includes/ztna_proxy_headers.conf;
+
+        # base CRL should be available without auth
+        proxy_set_header X-Bypass-SN-Check 1;
+
+        rewrite ^/api/v1/ztna_certificates/crl/download/base$ /crl/download/base break;
+        proxy_pass http://fcems_ztna;
+    }
+
+    # ************************** ztnaworker ***************************************
+    # Static file handling
+    location ~* ^/static/(css|dist|img|js) {
+        root $NGINX_WORK_DIR;
+        try_files $uri $uri/ =404;
+    }
+
+    # Logging
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+}

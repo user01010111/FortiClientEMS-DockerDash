@@ -1,10 +1,10 @@
 {
   "title": "EMS Containers",
   "uid": "ems-containers",
-  "description": "Per-container resource usage, network, filesystem, and restart churn via cAdvisor.",
+  "description": "Resource use across EMS containers, including CPU, memory, network traffic, filesystem activity and restart signals.",
   "tags": ["ems", "containers", "cadvisor"],
   "schemaVersion": 39,
-  "version": 3,
+  "version": 5,
   "refresh": "30s",
   "time": { "from": "now-6h", "to": "now" },
   "timezone": "browser",
@@ -19,8 +19,8 @@
         "name": "project",
         "label": "Compose Project Regex",
         "type": "textbox",
-        "query": "ems-.*",
-        "current": { "text": "ems-.*", "value": "ems-.*" },
+        "query": ".+",
+        "current": { "text": ".+", "value": ".+" },
         "hide": 0
       },
       {
@@ -35,10 +35,25 @@
   },
   "panels": [
     {
+      "id": 7,
+      "type": "text",
+      "title": "Overview",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Resource use across EMS containers, including CPU, memory, network traffic, filesystem activity and restart signals."
+      }
+    },
+    {
       "id": 1,
       "type": "timeseries",
       "title": "CPU by Service",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "cores" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -48,7 +63,7 @@
       "id": 2,
       "type": "timeseries",
       "title": "Memory by Service",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 3 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "bytes" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -58,7 +73,7 @@
       "id": 3,
       "type": "timeseries",
       "title": "Network Receive",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 11 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "Bps" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -68,7 +83,7 @@
       "id": 4,
       "type": "timeseries",
       "title": "Network Transmit",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 11 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "lineWidth": 2, "fillOpacity": 10 }, "unit": "Bps" }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] } },
@@ -78,7 +93,7 @@
       "id": 5,
       "type": "bargauge",
       "title": "Restart Churn by Service (24h)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
@@ -117,7 +132,7 @@
       "id": 6,
       "type": "bargauge",
       "title": "Filesystem Writes by Service",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
       "datasource": { "type": "prometheus", "uid": "ems-prometheus" },
       "fieldConfig": {
         "defaults": {
